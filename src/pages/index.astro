@@ -19,7 +19,7 @@
       </nav>
     </header>
     <main>
-      <h1>Kiem</h1>
+      <h1 class="typewriter" data-text="Kiem">Kiem</h1>
       <p>Game Developer | Godot | Python</p>
       <p>Welcome to my portfolio!</p>
     </main>
@@ -108,6 +108,22 @@
         requestAnimationFrame(animate);
       }
       animate();
+    </script>
+    <script>
+      const title = document.querySelector('.typewriter');
+      if (title) {
+        const text = title.getAttribute('data-text');
+        title.textContent = '';
+        let i = 0;
+        function type() {
+          if (i < text.length) {
+            title.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, 100);
+          }
+        }
+        setTimeout(type, 500);
+      }
     </script>
   </body>
 </html>
