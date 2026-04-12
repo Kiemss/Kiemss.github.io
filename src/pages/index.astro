@@ -125,6 +125,26 @@
         setTimeout(type, 500);
       }
     </script>
+    <script>
+      const backToTop = document.getElementById('back-to-top');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTop.style.opacity = '1';
+          backToTop.style.pointerEvents = 'auto';
+        } else {
+          backToTop.style.opacity = '0';
+          backToTop.style.pointerEvents = 'none';
+        }
+      });
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    </script>
+    <div id="back-to-top" class="back-to-top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </div>
   </body>
 </html>
 
@@ -213,5 +233,29 @@
   .social-links a:hover {
     color: #e0e0e0;
     filter: drop-shadow(0 0 8px rgba(228, 78, 0, 0.8));
+  }
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    background: rgba(228, 78, 0, 0.2);
+    border: 1px solid #e44e00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    color: #e44e00;
+    z-index: 100;
+  }
+  .back-to-top:hover {
+    background: rgba(228, 78, 0, 0.4);
+    box-shadow: 0 0 20px rgba(228, 78, 0, 0.6);
+    transform: translateY(-3px);
   }
 </style>
