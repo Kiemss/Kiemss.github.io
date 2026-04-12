@@ -12,6 +12,7 @@
   </head>
   <body>
     <canvas id="particles"></canvas>
+    <div id="cursor" class="cursor"></div>
     <header>
       <nav>
         <a href="/">Home</a>
@@ -140,6 +141,13 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     </script>
+    <script>
+      const cursor = document.getElementById('cursor');
+      document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+      });
+    </script>
     <div id="back-to-top" class="back-to-top">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="18 15 12 9 6 15"></polyline>
@@ -171,6 +179,40 @@
     height: 100%;
     z-index: -1;
     pointer-events: none;
+  }
+  .cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e44e00;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(228, 78, 0, 0.5);
+  }
+  .cursor::before,
+  .cursor::after {
+    content: '';
+    position: absolute;
+    background: #e44e00;
+  }
+  .cursor::before {
+    width: 2px;
+    height: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .cursor::after {
+    width: 8px;
+    height: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  body {
+    cursor: none;
   }
   header {
     padding: 2rem;
