@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "id": "case_snakebite",
+      "name": "蛇噬武器箱",
+      "image": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5lpKKqPrxN7LEm1Rd6dd2j6fA9NqhjwK3_kZoamj1I4KVcFI7YFvV_Ae2xOzs0Ja5tZ7BnHdh6CIm4C7D30vgKgHQFw/256fx256f",
+      "price": 2.50,
+      "keyPrice": 2.50,
+      "items": [
+        {
+          "id": "item_ak47_snakebite",
+          "name": "AK-47 | 蛇噬",
+          "type": "weapon",
+          "image": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhnfwJD3NOgm4S0k-O6laj4MrXWlGRd7cF9teXI8oThxgay-hU9YzvzJYPBJFVoNVyG_FG-wu_mgJG16pvJzHRguiYm5HfcnBOphxZNb-FxxavJG_E5oQ/256fx256f",
+          "inspectImage": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhnfwJD3NOgm4S0k-O6laj4MrXWlGRd7cF9teXI8oThxgay-hU9YzvzJYPBJFVoNVyG_FG-wu_mgJG16pvJzHRguiYm5HfcnBOphxZNb-FxxavJG_E5oQ/512fx384f",
+          "rarity": "covert",
+          "probability": 0.26,
+          "price": 150.00,
+          "collection": "蛇噬武器箱"
+        },
+        {
+          "id": "item_m4a1_printstream",
+          "name": "M4A1-S | Printstream",
+          "type": "weapon",
+          "image": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhnwMzJemkV09-5lpKKqPrxN7LEm1Rd6dd2j6fA9NqhjwK3_kZoamj1I4KVcFI7YFvV_Ae2xOzs0Ja5tZ7BnHdh6CIm4C7D30vgKgHQFw/256fx256f",
+          "inspectImage": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhnwMzJemkV09-5lpKKqPrxN7LEm1Rd6dd2j6fA9NqhjwK3_kZoamj1I4KVcFI7YFvV_Ae2xOzs0Ja5tZ7BnHdh6CIm4C7D30vgKgHQFw/512fx384f",
+          "rarity": "covert",
+          "probability": 0.26,
+          "price": 200.00,
+          "collection": "蛇噬武器箱"
+        },
+        {
+          "id": "item_butterfly_fade",
+          "name": "蝴蝶刀 | 渐变",
+          "type": "knife",
+          "image": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJl4G0k_jkI7fUhFRB4MRij7j--YXygED6-EZkZ233LYPEdwA6YVyD8li2xOy5gZe7upXJyiQ26Sg8pSGKFkPih0Y/256fx256f",
+          "inspectImage": "https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf2PLacDBA5ciJl4G0k_jkI7fUhFRB4MRij7j--YXygED6-EZkZ233LYPEdwA6YVyD8li2xOy5gZe7upXJyiQ26Sg8pSGKFkPih0Y/512fx384f",
+          "rarity": "special",
+          "probability": 0.26,
+          "price": 1500.00,
+          "collection": "蛇噬武器箱"
+        }
+      ],
+      "createdAt": "2026-04-17T00:00:00.000Z",
+      "updatedAt": "2026-04-17T00:00:00.000Z"
+    }
+  ],
+  "version": "1.0.0",
+  "lastModified": "2026-04-17T00:00:00.000Z"
+}
