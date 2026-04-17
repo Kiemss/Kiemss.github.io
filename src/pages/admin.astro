@@ -132,6 +132,107 @@ import Footer from '@/components/Footer.astro';
     </div>
   </div>
   
+  <div class="modal" id="items-modal" style="display: none;">
+    <div class="modal-content items-modal-content">
+      <h2 id="items-modal-title">管理奖品</h2>
+      <p class="modal-subtitle" id="items-case-name"></p>
+      
+      <div class="items-header">
+        <h3>奖品列表</h3>
+        <button class="btn-primary" id="add-item-btn">+ 添加奖品</button>
+      </div>
+      
+      <div class="items-list" id="items-list">
+        <div class="empty-state">
+          <p>暂无奖品</p>
+          <p class="hint">点击"添加奖品"开始配置</p>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-secondary" id="close-items-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="item-modal" style="display: none;">
+    <div class="modal-content">
+      <h2 id="item-modal-title">添加奖品</h2>
+      
+      <form id="item-form">
+        <div class="form-group">
+          <label>奖品名称 *</label>
+          <input type="text" id="item-name" required />
+        </div>
+        
+        <div class="form-group">
+          <label>类型 *</label>
+          <select id="item-type" required>
+            <option value="weapon">武器</option>
+            <option value="knife">刀</option>
+            <option value="gloves">手套</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>稀有度 *</label>
+          <select id="item-rarity" required>
+            <option value="consumer">消费级（白）</option>
+            <option value="industrial">工业级（灰）</option>
+            <option value="mil_spec">军规级（蓝）</option>
+            <option value="restricted">受限（紫）</option>
+            <option value="classified">保密（粉紫）</option>
+            <option value="covert">隐秘（红）</option>
+            <option value="special">特殊物品（金）</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>概率 (%) *</label>
+          <input type="number" id="item-probability" step="0.01" min="0" max="100" required />
+        </div>
+        
+        <div class="form-group">
+          <label>价格 (USD) *</label>
+          <input type="number" id="item-price" step="0.01" min="0" required />
+        </div>
+        
+        <div class="form-group">
+          <label>收藏品</label>
+          <input type="text" id="item-collection" />
+        </div>
+        
+        <div class="form-group">
+          <label>奖品图片</label>
+          <input type="file" id="item-image" accept="image/*" />
+          <div class="image-preview" id="item-image-preview"></div>
+        </div>
+        
+        <div class="form-group">
+          <label>或输入图片URL</label>
+          <input type="url" id="item-image-url" placeholder="https://..." />
+        </div>
+        
+        <div class="form-group">
+          <label>检视图片</label>
+          <input type="file" id="item-inspect-image" accept="image/*" />
+          <div class="image-preview" id="item-inspect-image-preview"></div>
+        </div>
+        
+        <div class="form-group">
+          <label>或输入检视图片URL</label>
+          <input type="url" id="item-inspect-image-url" placeholder="https://..." />
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancel-item-btn">取消</button>
+          <button type="submit" class="btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
   <Footer />
 </Layout>
 
@@ -472,17 +573,131 @@ import Footer from '@/components/Footer.astro';
   .modal-actions button {
     flex: 1;
   }
+  
+  .items-modal-content {
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .modal-subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .items-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .item-entry {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+  }
+  
+  .item-entry img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .item-entry-info {
+    flex: 1;
+  }
+  
+  .item-entry-name {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  .item-entry-details {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  
+  .item-entry-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .btn-manage {
+    padding: 0.5rem 1rem;
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+  }
+  
+  .btn-manage:hover {
+    background: #4caf50;
+    color: white;
+  }
+  
+  .probability-check {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-top: 0.25rem;
+  }
+  
+  .probability-check.valid {
+    color: #4caf50;
+  }
+  
+  .probability-check.invalid {
+    color: #f44336;
+  }
+  
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  select option {
+    background: var(--color-background);
+    color: var(--color-text);
+  }
 </style>
 
 <script>
   import { StorageManager } from '@/scripts/storage-manager';
   import { AdminManager } from '@/scripts/admin-manager';
+  import { LotteryEngine } from '@/scripts/lottery-engine';
+  import { RarityColors, RarityNames } from '@/types/rarity';
   import type { Case } from '@/types/case';
+  import type { CaseItem } from '@/types/item';
 
   const storage = StorageManager.getInstance();
   const admin = new AdminManager();
+  const lottery = new LotteryEngine();
 
   let editingCaseId: string | null = null;
+  let editingItemId: string | null = null;
+  let currentCaseId: string | null = null;
 
   function loadCases() {
     const cases = storage.getCases();
@@ -500,14 +715,20 @@ import Footer from '@/components/Footer.astro';
 
     casesList.innerHTML = cases.map(caseItem => `
       <div class="case-item" data-id="${caseItem.id}">
-        <img src="${caseItem.image}" alt="${caseItem.name}" class="case-thumb" />
+        <img src="${caseItem.image}" alt="${caseItem.name}" class="case-thumb" 
+             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><rect fill=%22%230a0a0a%22 width=%22120%22 height=%22120%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>暂无图片</text></svg>'" />
         <div class="case-info">
           <h3>${caseItem.name}</h3>
           <p>价格: $${caseItem.price.toFixed(2)}</p>
           <p>钥匙: $${caseItem.keyPrice.toFixed(2)}</p>
           <p>奖品数: ${caseItem.items.length}</p>
+          ${caseItem.items.length > 0 ? `<p class="probability-check ${lottery.validateProbabilities(caseItem.items) ? 'valid' : 'invalid'}">
+            概率: ${caseItem.items.reduce((sum, item) => sum + item.probability, 0).toFixed(2)}%
+            ${lottery.validateProbabilities(caseItem.items) ? '✓' : '✗ (需等于100%)'}
+          </p>` : ''}
         </div>
         <div class="case-actions">
+          <button class="btn-manage" onclick="manageItems('${caseItem.id}')">管理奖品</button>
           <button class="btn-edit" onclick="editCase('${caseItem.id}')">编辑</button>
           <button class="btn-delete" onclick="deleteCase('${caseItem.id}')">删除</button>
         </div>
@@ -654,6 +875,173 @@ import Footer from '@/components/Footer.astro';
   });
 
   loadCases();
+
+  // 奖品管理功能
+  (window as any).manageItems = (caseId: string) => {
+    currentCaseId = caseId;
+    const cases = storage.getCases();
+    const caseItem = cases.find(c => c.id === caseId);
+    
+    if (!caseItem) return;
+    
+    (document.getElementById('items-case-name') as HTMLElement).textContent = `箱子: ${caseItem.name}`;
+    loadItems(caseItem.items);
+    
+    (document.getElementById('items-modal') as HTMLElement).style.display = 'flex';
+  };
+
+  function loadItems(items: CaseItem[]) {
+    const itemsList = document.getElementById('items-list') as HTMLElement;
+    
+    if (items.length === 0) {
+      itemsList.innerHTML = `
+        <div class="empty-state">
+          <p>暂无奖品</p>
+          <p class="hint">点击"添加奖品"开始配置</p>
+        </div>
+      `;
+      return;
+    }
+    
+    itemsList.innerHTML = items.map(item => `
+      <div class="item-entry" data-id="${item.id}">
+        <img src="${item.image}" alt="${item.name}"
+             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%230a0a0a%22 width=%2260%22 height=%2260%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%228%22>暂无图片</text></svg>'" />
+        <div class="item-entry-info">
+          <div class="item-entry-name" style="color: ${RarityColors[item.rarity]}">${item.name}</div>
+          <div class="item-entry-details">
+            ${RarityNames[item.rarity]} | ${item.type} | 概率: ${item.probability}% | 价格: $${item.price.toFixed(2)}
+          </div>
+        </div>
+        <div class="item-entry-actions">
+          <button class="btn-edit" onclick="editItem('${item.id}')">编辑</button>
+          <button class="btn-delete" onclick="deleteItem('${item.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('add-item-btn')?.addEventListener('click', () => {
+    editingItemId = null;
+    (document.getElementById('item-modal-title') as HTMLElement).textContent = '添加奖品';
+    (document.getElementById('item-form') as HTMLFormElement).reset();
+    (document.getElementById('item-image-preview') as HTMLElement).innerHTML = '';
+    (document.getElementById('item-inspect-image-preview') as HTMLElement).innerHTML = '';
+    (document.getElementById('item-modal') as HTMLElement).style.display = 'flex';
+  });
+
+  document.getElementById('close-items-btn')?.addEventListener('click', () => {
+    (document.getElementById('items-modal') as HTMLElement).style.display = 'none';
+    loadCases();
+  });
+
+  document.getElementById('cancel-item-btn')?.addEventListener('click', () => {
+    (document.getElementById('item-modal') as HTMLElement).style.display = 'none';
+  });
+
+  (window as any).editItem = (itemId: string) => {
+    if (!currentCaseId) return;
+    
+    const cases = storage.getCases();
+    const caseItem = cases.find(c => c.id === currentCaseId);
+    if (!caseItem) return;
+    
+    const item = caseItem.items.find(i => i.id === itemId);
+    if (!item) return;
+    
+    editingItemId = itemId;
+    (document.getElementById('item-modal-title') as HTMLElement).textContent = '编辑奖品';
+    
+    (document.getElementById('item-name') as HTMLInputElement).value = item.name;
+    (document.getElementById('item-type') as HTMLSelectElement).value = item.type;
+    (document.getElementById('item-rarity') as HTMLSelectElement).value = item.rarity;
+    (document.getElementById('item-probability') as HTMLInputElement).value = item.probability.toString();
+    (document.getElementById('item-price') as HTMLInputElement).value = item.price.toString();
+    (document.getElementById('item-collection') as HTMLInputElement).value = item.collection || '';
+    (document.getElementById('item-image-url') as HTMLInputElement).value = item.image;
+    (document.getElementById('item-inspect-image-url') as HTMLInputElement).value = item.inspectImage;
+    
+    const preview = document.getElementById('item-image-preview') as HTMLElement;
+    preview.innerHTML = `<img src="${item.image}" alt="预览" style="max-width: 100px; max-height: 100px;" 
+      onerror="this.style.display='none'" />`;
+    
+    const inspectPreview = document.getElementById('item-inspect-image-preview') as HTMLElement;
+    inspectPreview.innerHTML = `<img src="${item.inspectImage}" alt="预览" style="max-width: 100px; max-height: 100px;"
+      onerror="this.style.display='none'" />`;
+    
+    (document.getElementById('item-modal') as HTMLElement).style.display = 'flex';
+  };
+
+  (window as any).deleteItem = (itemId: string) => {
+    if (!currentCaseId) return;
+    
+    if (confirm('确定要删除这个奖品吗？')) {
+      admin.deleteItemFromCase(currentCaseId, itemId);
+      
+      const cases = storage.getCases();
+      const caseItem = cases.find(c => c.id === currentCaseId);
+      if (caseItem) {
+        loadItems(caseItem.items);
+      }
+    }
+  };
+
+  document.getElementById('item-image')?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const base64 = await admin.imageToBase64(file);
+      const preview = document.getElementById('item-image-preview') as HTMLElement;
+      preview.innerHTML = `<img src="${base64}" alt="预览" style="max-width: 100px; max-height: 100px;" />`;
+      (document.getElementById('item-image-url') as HTMLInputElement).value = base64;
+    }
+  });
+
+  document.getElementById('item-inspect-image')?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const base64 = await admin.imageToBase64(file);
+      const preview = document.getElementById('item-inspect-image-preview') as HTMLElement;
+      preview.innerHTML = `<img src="${base64}" alt="预览" style="max-width: 100px; max-height: 100px;" />`;
+      (document.getElementById('item-inspect-image-url') as HTMLInputElement).value = base64;
+    }
+  });
+
+  document.getElementById('item-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    if (!currentCaseId) return;
+    
+    const name = (document.getElementById('item-name') as HTMLInputElement).value;
+    const type = (document.getElementById('item-type') as HTMLSelectElement).value as CaseItem['type'];
+    const rarity = (document.getElementById('item-rarity') as HTMLSelectElement).value as CaseItem['rarity'];
+    const probability = parseFloat((document.getElementById('item-probability') as HTMLInputElement).value);
+    const price = parseFloat((document.getElementById('item-price') as HTMLInputElement).value);
+    const collection = (document.getElementById('item-collection') as HTMLInputElement).value;
+    const image = (document.getElementById('item-image-url') as HTMLInputElement).value;
+    const inspectImage = (document.getElementById('item-inspect-image-url') as HTMLInputElement).value;
+
+    if (!image) {
+      alert('请上传奖品图片或输入图片URL！');
+      return;
+    }
+
+    if (editingItemId) {
+      const updatedItem = admin.createItem(name, type, image, inspectImage || image, rarity, probability, price, collection);
+      updatedItem.id = editingItemId;
+      admin.updateItemInCase(currentCaseId, editingItemId, updatedItem);
+    } else {
+      const newItem = admin.createItem(name, type, image, inspectImage || image, rarity, probability, price, collection);
+      admin.addItemToCase(currentCaseId, newItem);
+    }
+
+    (document.getElementById('item-modal') as HTMLElement).style.display = 'none';
+    
+    const cases = storage.getCases();
+    const caseItem = cases.find(c => c.id === currentCaseId);
+    if (caseItem) {
+      loadItems(caseItem.items);
+    }
+  });
 
   const settings = storage.getUserData().settings;
   (document.getElementById('initial-balance') as HTMLInputElement).value = settings.initialBalance.toString();
