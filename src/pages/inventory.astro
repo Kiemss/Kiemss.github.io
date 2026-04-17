@@ -1,0 +1,475 @@
+---
+import Layout from '@/components/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+---
+
+<Layout 
+  title="我的仓库 - CS2抽奖模拟器"
+  description="查看和管理您的物品"
+>
+  <Header currentPage="/inventory" />
+  
+  <main class="inventory-page">
+    <div class="container">
+      <h1>我的仓库</h1>
+      <p class="subtitle">查看和管理您获得的物品</p>
+      
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-label">物品数量</span>
+          <span class="stat-value" id="item-count">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">总价值</span>
+          <span class="stat-value" id="total-value">$0.00</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">余额</span>
+          <span class="stat-value" id="balance">$0.00</span>
+        </div>
+      </div>
+      
+      <div class="actions-bar">
+        <button class="btn-secondary" id="sell-all-btn">出售所有物品</button>
+        <button class="btn-danger" id="clear-inventory-btn">清空仓库</button>
+      </div>
+      
+      <div class="inventory-grid" id="inventory-grid">
+        <div class="empty-state">
+          <p>仓库是空的</p>
+          <p class="hint">去抽奖页面开箱获得物品吧！</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div class="modal" id="inspect-modal" style="display: none;">
+    <div class="modal-content inspect-modal-content">
+      <button class="close-btn" id="close-inspect">&times;</button>
+      <img src="" alt="" class="inspect-image" id="inspect-image" />
+      <h2 id="inspect-name"></h2>
+      <p class="inspect-info" id="inspect-rarity"></p>
+      <p class="inspect-info" id="inspect-type"></p>
+      <p class="inspect-info" id="inspect-collection"></p>
+      <p class="inspect-price" id="inspect-price"></p>
+      <p class="inspect-date" id="inspect-date"></p>
+      <div class="modal-actions">
+        <button class="btn-primary" id="sell-item-btn">出售物品</button>
+        <button class="btn-secondary" id="cancel-inspect-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .inventory-page {
+    flex: 1;
+    padding: 2rem;
+    min-height: calc(100vh - 200px);
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+    text-shadow: 0 0 30px rgba(228, 78, 0, 0.5);
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+  
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(228, 78, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(228, 78, 0, 0.3);
+  }
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .stat-label {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-text);
+  }
+  
+  .actions-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .btn-danger {
+    padding: 0.75rem 1.5rem;
+    background: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .btn-danger:hover {
+    background: rgba(220, 53, 69, 1);
+  }
+  
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  
+  .btn-primary:hover {
+    background: rgba(228, 78, 0, 0.8);
+    box-shadow: 0 0 20px rgba(228, 78, 0, 0.5);
+  }
+  
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .inventory-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s;
+    border: 2px solid;
+    cursor: pointer;
+  }
+  
+  .inventory-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .inventory-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+  }
+  
+  .item-name {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .item-price {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--color-primary);
+  }
+  
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: var(--color-text-muted);
+  }
+  
+  .empty-state .hint {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .inspect-modal-content {
+    background: var(--color-background);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 2px solid var(--color-primary);
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .close-btn:hover {
+    color: var(--color-primary);
+  }
+  
+  .inspect-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+  }
+  
+  .inspect-modal-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+  
+  .inspect-info {
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+  }
+  
+  .inspect-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin: 1rem 0;
+  }
+  
+  .inspect-date {
+    color: var(--color-text-subtle);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .modal-actions button {
+    flex: 1;
+  }
+</style>
+
+<script>
+  import { StorageManager } from '@/scripts/storage-manager';
+  import { EconomySystem } from '@/scripts/economy-system';
+  import { RarityColors, RarityNames } from '@/types/rarity';
+  import type { InventoryItem } from '@/types/item';
+
+  const storage = StorageManager.getInstance();
+  const economy = new EconomySystem();
+
+  let currentItemId: string | null = null;
+
+  function loadInventory() {
+    const userData = storage.getUserData();
+    const inventory = userData.inventory;
+    
+    const itemCount = document.getElementById('item-count');
+    const totalValue = document.getElementById('total-value');
+    const balanceEl = document.getElementById('balance');
+    const grid = document.getElementById('inventory-grid');
+    
+    if (itemCount) itemCount.textContent = inventory.length.toString();
+    
+    const total = inventory.reduce((sum, item) => sum + item.price, 0);
+    if (totalValue) totalValue.textContent = `$${total.toFixed(2)}`;
+    
+    if (balanceEl) balanceEl.textContent = `$${userData.balance.toFixed(2)}`;
+    
+    if (inventory.length === 0) {
+      grid!.innerHTML = `
+        <div class="empty-state">
+          <p>仓库是空的</p>
+          <p class="hint">去抽奖页面开箱获得物品吧！</p>
+        </div>
+      `;
+      return;
+    }
+    
+    grid!.innerHTML = inventory.map((item, index) => `
+      <div class="inventory-item" 
+           data-index="${index}"
+           style="border-color: ${RarityColors[item.rarity]}">
+        <img src="${item.image}" alt="${item.name}" 
+             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22120%22><rect fill=%22%230a0a0a%22 width=%22200%22 height=%22120%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22>暂无图片</text></svg>'" />
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">$${item.price.toFixed(2)}</div>
+      </div>
+    `).join('');
+    
+    document.querySelectorAll('.inventory-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const index = parseInt(item.getAttribute('data-index') || '0');
+        showInspectModal(inventory[index], index);
+      });
+    });
+  }
+
+  function showInspectModal(item: InventoryItem, index: number) {
+    currentItemId = item.id;
+    
+    const modal = document.getElementById('inspect-modal') as HTMLElement;
+    const image = document.getElementById('inspect-image') as HTMLImageElement;
+    const name = document.getElementById('inspect-name') as HTMLElement;
+    const rarity = document.getElementById('inspect-rarity') as HTMLElement;
+    const type = document.getElementById('inspect-type') as HTMLElement;
+    const collection = document.getElementById('inspect-collection') as HTMLElement;
+    const price = document.getElementById('inspect-price') as HTMLElement;
+    const date = document.getElementById('inspect-date') as HTMLElement;
+    
+    image.src = item.inspectImage || item.image;
+    image.onerror = () => {
+      image.src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22300%22><rect fill=%22%230a0a0a%22 width=%22600%22 height=%22300%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>暂无图片</text></svg>';
+    };
+    
+    name.textContent = item.name;
+    rarity.textContent = `稀有度: ${RarityNames[item.rarity]}`;
+    rarity.style.color = RarityColors[item.rarity];
+    type.textContent = `类型: ${item.type}`;
+    collection.textContent = `收藏品: ${item.collection || '未知'}`;
+    price.textContent = `$${item.price.toFixed(2)}`;
+    date.textContent = `获得时间: ${new Date(item.obtainedAt).toLocaleString()}`;
+    
+    modal.style.display = 'flex';
+  }
+
+  document.getElementById('close-inspect')?.addEventListener('click', () => {
+    (document.getElementById('inspect-modal') as HTMLElement).style.display = 'none';
+  });
+
+  document.getElementById('cancel-inspect-btn')?.addEventListener('click', () => {
+    (document.getElementById('inspect-modal') as HTMLElement).style.display = 'none';
+  });
+
+  document.getElementById('sell-item-btn')?.addEventListener('click', () => {
+    if (!currentItemId) return;
+    
+    const userData = storage.getUserData();
+    const itemIndex = userData.inventory.findIndex(i => i.id === currentItemId);
+    
+    if (itemIndex === -1) return;
+    
+    const item = userData.inventory[itemIndex];
+    
+    if (confirm(`确定要出售 ${item.name} 吗？\n售价: $${item.price.toFixed(2)}`)) {
+      economy.earn(item.price, `出售: ${item.name}`, item.id);
+      
+      userData.inventory.splice(itemIndex, 1);
+      storage.updateBalance(userData.balance);
+      
+      (document.getElementById('inspect-modal') as HTMLElement).style.display = 'none';
+      loadInventory();
+      
+      alert(`成功出售 ${item.name}，获得 $${item.price.toFixed(2)}`);
+    }
+  });
+
+  document.getElementById('sell-all-btn')?.addEventListener('click', () => {
+    const userData = storage.getUserData();
+    const inventory = userData.inventory;
+    
+    if (inventory.length === 0) {
+      alert('仓库是空的！');
+      return;
+    }
+    
+    const totalValue = inventory.reduce((sum, item) => sum + item.price, 0);
+    
+    if (confirm(`确定要出售所有物品吗？\n共 ${inventory.length} 个物品\n总价值: $${totalValue.toFixed(2)}`)) {
+      inventory.forEach(item => {
+        economy.earn(item.price, `出售: ${item.name}`, item.id);
+      });
+      
+      userData.inventory = [];
+      storage.updateBalance(userData.balance);
+      
+      loadInventory();
+      
+      alert(`成功出售所有物品，获得 $${totalValue.toFixed(2)}`);
+    }
+  });
+
+  document.getElementById('clear-inventory-btn')?.addEventListener('click', () => {
+    const userData = storage.getUserData();
+    
+    if (userData.inventory.length === 0) {
+      alert('仓库已经是空的！');
+      return;
+    }
+    
+    if (confirm('确定要清空仓库吗？物品将永久丢失！')) {
+      userData.inventory = [];
+      storage.updateBalance(userData.balance);
+      loadInventory();
+      alert('仓库已清空');
+    }
+  });
+
+  loadInventory();
+</script>

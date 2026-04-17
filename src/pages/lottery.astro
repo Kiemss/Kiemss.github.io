@@ -32,7 +32,12 @@ const cases = casesData.cases;
       <div class="cases-grid">
         {cases.map((caseItem) => (
           <div class="case-card" data-case-id={caseItem.id}>
-            <img src={caseItem.image} alt={caseItem.name} class="case-image" />
+            <img 
+              src={caseItem.image} 
+              alt={caseItem.name} 
+              class="case-image"
+              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22250%22 height=%22200%22><rect fill=%22%230a0a0a%22 width=%22250%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22>暂无图片</text></svg>'"
+            />
             <h3 class="case-name">{caseItem.name}</h3>
             <p class="case-price">${caseItem.price.toFixed(2)}</p>
             <button class="open-case-btn">开箱</button>
