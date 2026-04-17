@@ -1,0 +1,89 @@
+---
+import Particles from './Particles.astro';
+import BackToTop from './BackToTop.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  showParticles?: boolean;
+  showBackToTop?: boolean;
+  customCursor?: boolean;
+}
+
+const { 
+  title, 
+  description = 'Kiem\'s Portfolio - Game Developer',
+  showParticles = false,
+  showBackToTop = false,
+  customCursor = false
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class:list={[{ 'custom-cursor': customCursor }]}>
+    {showParticles && <Particles />}
+    {customCursor && <div id="cursor" class="cursor"></div>}
+    <slot />
+    {showBackToTop && <BackToTop />}
+  </body>
+</html>
+
+<style>
+  body.custom-cursor {
+    cursor: none;
+  }
+
+  .cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px rgba(228, 78, 0, 0.5);
+  }
+
+  .cursor::before,
+  .cursor::after {
+    content: '';
+    position: absolute;
+    background: var(--color-primary);
+  }
+
+  .cursor::before {
+    width: 2px;
+    height: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cursor::after {
+    width: 8px;
+    height: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+
+{customCursor && (
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+  </script>
+)}

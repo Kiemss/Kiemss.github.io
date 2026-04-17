@@ -1,238 +1,28 @@
 ---
+import Layout from '@/components/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
 ---
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Kiem's Portfolio - Game Developer" />
-    <title>Kiem - Game Developer</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
-  <body>
-    <canvas id="particles"></canvas>
-    <div id="cursor" class="cursor"></div>
-    <header>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/projects">Projects</a>
-      </nav>
-    </header>
-    <main>
-      <h1 class="typewriter" data-text="Kiem">Kiem</h1>
-      <p>Game Developer | Godot | Python</p>
-      <p>Welcome to my portfolio!</p>
-    </main>
-    <footer>
-      <p>&copy; 2026 Kiem. All rights reserved.</p>
-      <div class="social-links">
-        <a href="https://github.com/Kiemss" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-        </a>
-      </div>
-    </footer>
-    <script>
-      const canvas = document.getElementById('particles');
-      const ctx = canvas.getContext('2d');
-      let particles = [];
-      const particleCount = 80;
-      const connectionDistance = 120;
-      const mouseRadius = 100;
-      let mouse = { x: -1000, y: -1000 };
-
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-      });
-
-      class Particle {
-        constructor() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.vx = (Math.random() - 0.5) * 0.5;
-          this.vy = (Math.random() - 0.5) * 0.5;
-          this.size = Math.random() * 2 + 1;
-        }
-        update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-          if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-        }
-        draw() {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(228, 78, 0, 0.6)';
-          ctx.fill();
-        }
-      }
-
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-      }
-
-      function drawConnections() {
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < connectionDistance) {
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.strokeStyle = `rgba(228, 78, 0, ${0.3 - dist / connectionDistance * 0.3})`;
-              ctx.lineWidth = 0.5;
-              ctx.stroke();
-            }
-          }
-        }
-      }
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-          p.update();
-          p.draw();
-        });
-        drawConnections();
-        requestAnimationFrame(animate);
-      }
-      animate();
-    </script>
-    <script>
-      const title = document.querySelector('.typewriter');
-      if (title) {
-        const text = title.getAttribute('data-text');
-        title.textContent = '';
-        let i = 0;
-        function type() {
-          if (i < text.length) {
-            title.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, 100);
-          }
-        }
-        setTimeout(type, 500);
-      }
-    </script>
-    <script>
-      const backToTop = document.getElementById('back-to-top');
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-          backToTop.style.opacity = '1';
-          backToTop.style.pointerEvents = 'auto';
-        } else {
-          backToTop.style.opacity = '0';
-          backToTop.style.pointerEvents = 'none';
-        }
-      });
-      backToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    </script>
-    <script>
-      const cursor = document.getElementById('cursor');
-      document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-      });
-    </script>
-    <div id="back-to-top" class="back-to-top">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="18 15 12 9 6 15"></polyline>
-      </svg>
-    </div>
-  </body>
-</html>
+<Layout 
+  title="Kiem - Game Developer" 
+  description="Kiem's Portfolio - Game Developer"
+  showParticles={true}
+  showBackToTop={true}
+  customCursor={true}
+>
+  <Header currentPage="/" />
+  
+  <main>
+    <h1 class="typewriter" data-text="Kiem">Kiem</h1>
+    <p>Game Developer | Godot | Python</p>
+    <p>Welcome to my portfolio!</p>
+  </main>
+  
+  <Footer showSocialLinks={true} year={2026} />
+</Layout>
 
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #0a0a0a;
-    color: #e0e0e0;
-  }
-  canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-  }
-  .cursor {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e44e00;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 10px rgba(228, 78, 0, 0.5);
-  }
-  .cursor::before,
-  .cursor::after {
-    content: '';
-    position: absolute;
-    background: #e44e00;
-  }
-  .cursor::before {
-    width: 2px;
-    height: 8px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .cursor::after {
-    width: 8px;
-    height: 2px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  body {
-    cursor: none;
-  }
-  header {
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-  }
-  nav {
-    display: flex;
-    gap: 2rem;
-  }
-  nav a {
-    color: #888;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-  }
-  nav a:hover {
-    color: #e44e00;
-    text-shadow: 0 0 20px rgba(228, 78, 0, 0.8), 0 0 40px rgba(228, 78, 0, 0.4);
-  }
   main {
     flex: 1;
     display: flex;
@@ -242,6 +32,7 @@
     text-align: center;
     padding: 2rem;
   }
+  
   h1 {
     font-size: 4rem;
     font-weight: 700;
@@ -249,55 +40,27 @@
     letter-spacing: -0.02em;
     text-shadow: 0 0 30px rgba(228, 78, 0, 0.5);
   }
+  
   p {
     font-size: 1.2rem;
-    color: #888;
+    color: var(--color-text-muted);
     margin-bottom: 0.25rem;
   }
-  footer {
-    padding: 2rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #555;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  .social-links {
-    display: flex;
-    gap: 1rem;
-  }
-  .social-links a {
-    color: #555;
-    transition: color 0.2s;
-  }
-  .social-links a:hover {
-    color: #e0e0e0;
-    filter: drop-shadow(0 0 8px rgba(228, 78, 0, 0.8));
-  }
-  .back-to-top {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 48px;
-    height: 48px;
-    background: rgba(228, 78, 0, 0.2);
-    border: 1px solid #e44e00;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s;
-    color: #e44e00;
-    z-index: 100;
-  }
-  .back-to-top:hover {
-    background: rgba(228, 78, 0, 0.4);
-    box-shadow: 0 0 20px rgba(228, 78, 0, 0.6);
-    transform: translateY(-3px);
-  }
 </style>
+
+<script>
+  const title = document.querySelector('.typewriter');
+  if (title) {
+    const text = title.getAttribute('data-text');
+    title.textContent = '';
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        title.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, 100);
+      }
+    }
+    setTimeout(type, 500);
+  }
+</script>

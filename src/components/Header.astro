@@ -1,0 +1,87 @@
+---
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  currentPage?: string;
+  items?: NavItem[];
+}
+
+const defaultItems: NavItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' }
+];
+
+const { currentPage = '', items = defaultItems } = Astro.props;
+
+function isActive(href: string, current: string): boolean {
+  if (href === '/') {
+    return current === '/' || current === '';
+  }
+  return current.startsWith(href);
+}
+---
+
+<header>
+  <nav>
+    {items.map((item) => (
+      <a 
+        href={item.href} 
+        class:list={[{ active: isActive(item.href, currentPage) }]}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
+</header>
+
+<style>
+  header {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  nav {
+    display: flex;
+    gap: 2rem;
+  }
+
+  nav a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color var(--transition-duration);
+    position: relative;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-primary);
+    transition: width var(--transition-duration);
+  }
+
+  nav a:hover {
+    color: var(--color-primary);
+    text-shadow: var(--shadow-glow);
+  }
+
+  nav a:hover::after {
+    width: 100%;
+  }
+
+  nav a.active {
+    color: var(--color-primary);
+  }
+
+  nav a.active::after {
+    width: 100%;
+  }
+</style>

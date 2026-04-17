@@ -1,65 +1,24 @@
 ---
+import Layout from '@/components/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
 ---
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Kiem's Projects - Game Developer" />
-    <title>Projects - Kiem</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
-  <body>
-    <header>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/projects">Projects</a>
-      </nav>
-    </header>
-    <main>
-      <h1>Projects</h1>
-      <p class="coming-soon">More projects coming soon...</p>
-    </main>
-    <footer>
-      <p>&copy; 2026 Kiem. All rights reserved.</p>
-    </footer>
-  </body>
-</html>
+<Layout 
+  title="Projects - Kiem" 
+  description="Kiem's Projects - Game Developer"
+>
+  <Header currentPage="/projects" />
+  
+  <main>
+    <h1>Projects</h1>
+    <p class="coming-soon">More projects coming soon...</p>
+  </main>
+  
+  <Footer />
+</Layout>
 
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #0a0a0a;
-    color: #e0e0e0;
-  }
-  header {
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-  }
-  nav {
-    display: flex;
-    gap: 2rem;
-  }
-  nav a {
-    color: #888;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-  }
-  nav a:hover {
-    color: #e44e00;
-  }
   main {
     flex: 1;
     display: flex;
@@ -69,20 +28,16 @@
     text-align: center;
     padding: 2rem;
   }
+  
   h1 {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 1rem;
     letter-spacing: -0.02em;
   }
+  
   .coming-soon {
     font-size: 1.2rem;
-    color: #555;
-  }
-  footer {
-    padding: 2rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #555;
+    color: var(--color-text-subtle);
   }
 </style>
