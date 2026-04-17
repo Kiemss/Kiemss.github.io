@@ -264,6 +264,84 @@ import Footer from '@/components/Footer.astro';
     gap: 1.5rem;
   }
   
+  .case-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+  }
+  
+  .case-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(228, 78, 0, 0.2);
+  }
+  
+  .case-thumb {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .case-info {
+    flex: 1;
+  }
+  
+  .case-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+  
+  .case-info p {
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .case-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  
+  .btn-edit {
+    padding: 0.5rem 1rem;
+    background: rgba(228, 78, 0, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+  }
+  
+  .btn-edit:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  .btn-delete {
+    padding: 0.5rem 1rem;
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+  }
+  
+  .btn-delete:hover {
+    background: #dc3545;
+    color: white;
+  }
+  
   .empty-state {
     text-align: center;
     padding: 3rem;
@@ -397,17 +475,188 @@ import Footer from '@/components/Footer.astro';
 </style>
 
 <script>
-  // 管理界面逻辑将在后续实现
-  console.log('管理界面已加载');
-  
-  // 标签切换
+  import { StorageManager } from '@/scripts/storage-manager';
+  import { AdminManager } from '@/scripts/admin-manager';
+  import type { Case } from '@/types/case';
+
+  const storage = StorageManager.getInstance();
+  const admin = new AdminManager();
+
+  let editingCaseId: string | null = null;
+
+  function loadCases() {
+    const cases = storage.getCases();
+    const casesList = document.getElementById('cases-list')!;
+    
+    if (cases.length === 0) {
+      casesList.innerHTML = `
+        <div class="empty-state">
+          <p>暂无箱子配置</p>
+          <p class="hint">点击"添加箱子"开始配置</p>
+        </div>
+      `;
+      return;
+    }
+
+    casesList.innerHTML = cases.map(caseItem => `
+      <div class="case-item" data-id="${caseItem.id}">
+        <img src="${caseItem.image}" alt="${caseItem.name}" class="case-thumb" />
+        <div class="case-info">
+          <h3>${caseItem.name}</h3>
+          <p>价格: $${caseItem.price.toFixed(2)}</p>
+          <p>钥匙: $${caseItem.keyPrice.toFixed(2)}</p>
+          <p>奖品数: ${caseItem.items.length}</p>
+        </div>
+        <div class="case-actions">
+          <button class="btn-edit" onclick="editCase('${caseItem.id}')">编辑</button>
+          <button class="btn-delete" onclick="deleteCase('${caseItem.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  (window as any).editCase = (id: string) => {
+    const cases = storage.getCases();
+    const caseItem = cases.find(c => c.id === id);
+    if (!caseItem) return;
+
+    editingCaseId = id;
+    (document.getElementById('modal-title') as HTMLElement).textContent = '编辑箱子';
+    (document.getElementById('case-name') as HTMLInputElement).value = caseItem.name;
+    (document.getElementById('case-price') as HTMLInputElement).value = caseItem.price.toString();
+    (document.getElementById('key-price') as HTMLInputElement).value = caseItem.keyPrice.toString();
+    (document.getElementById('case-image-url') as HTMLInputElement).value = caseItem.image;
+    
+    const preview = document.getElementById('case-image-preview') as HTMLElement;
+    preview.innerHTML = `<img src="${caseItem.image}" alt="预览" />`;
+    
+    (document.getElementById('case-modal') as HTMLElement).style.display = 'flex';
+  };
+
+  (window as any).deleteCase = (id: string) => {
+    if (confirm('确定要删除这个箱子吗？')) {
+      admin.deleteCase(id);
+      loadCases();
+    }
+  };
+
+  document.getElementById('add-case-btn')?.addEventListener('click', () => {
+    editingCaseId = null;
+    (document.getElementById('modal-title') as HTMLElement).textContent = '添加箱子';
+    (document.getElementById('case-form') as HTMLFormElement).reset();
+    (document.getElementById('case-image-preview') as HTMLElement).innerHTML = '';
+    (document.getElementById('case-modal') as HTMLElement).style.display = 'flex';
+  });
+
+  document.getElementById('cancel-case-btn')?.addEventListener('click', () => {
+    (document.getElementById('case-modal') as HTMLElement).style.display = 'none';
+  });
+
+  document.getElementById('case-image')?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const base64 = await admin.imageToBase64(file);
+      const preview = document.getElementById('case-image-preview') as HTMLElement;
+      preview.innerHTML = `<img src="${base64}" alt="预览" />`;
+      (document.getElementById('case-image-url') as HTMLInputElement).value = base64;
+    }
+  });
+
+  document.getElementById('case-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = (document.getElementById('case-name') as HTMLInputElement).value;
+    const price = parseFloat((document.getElementById('case-price') as HTMLInputElement).value);
+    const keyPrice = parseFloat((document.getElementById('key-price') as HTMLInputElement).value);
+    const image = (document.getElementById('case-image-url') as HTMLInputElement).value;
+
+    if (editingCaseId) {
+      const cases = storage.getCases();
+      const existingCase = cases.find(c => c.id === editingCaseId);
+      if (existingCase) {
+        const updatedCase: Case = {
+          ...existingCase,
+          name,
+          price,
+          keyPrice,
+          image,
+          updatedAt: new Date()
+        };
+        admin.updateCase(editingCaseId, updatedCase);
+      }
+    } else {
+      const newCase = admin.createCase(name, price, keyPrice, image);
+      admin.addCase(newCase);
+    }
+
+    (document.getElementById('case-modal') as HTMLElement).style.display = 'none';
+    loadCases();
+  });
+
+  document.getElementById('export-config-btn')?.addEventListener('click', () => {
+    const config = admin.exportConfig();
+    const blob = new Blob([config], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cs2-lottery-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('import-config-btn')?.addEventListener('click', () => {
+    (document.getElementById('import-config-input') as HTMLInputElement).click();
+  });
+
+  document.getElementById('import-config-input')?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const text = await file.text();
+      if (admin.importConfig(text)) {
+        alert('配置导入成功！');
+        loadCases();
+      } else {
+        alert('配置导入失败，请检查文件格式！');
+      }
+    }
+  });
+
+  document.getElementById('reset-config-btn')?.addEventListener('click', () => {
+    if (confirm('确定要重置为默认配置吗？这将清除所有自定义配置！')) {
+      admin.resetToDefault();
+      loadCases();
+      alert('已重置为默认配置！');
+    }
+  });
+
+  document.getElementById('save-settings-btn')?.addEventListener('click', () => {
+    const initialBalance = parseFloat((document.getElementById('initial-balance') as HTMLInputElement).value);
+    const soundEnabled = (document.getElementById('sound-enabled') as HTMLInputElement).checked;
+    const animationEnabled = (document.getElementById('animation-enabled') as HTMLInputElement).checked;
+
+    storage.updateSettings({
+      initialBalance,
+      soundEnabled,
+      animationEnabled
+    });
+
+    alert('设置已保存！');
+  });
+
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       
       btn.classList.add('active');
-      document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+      document.getElementById(`${(btn as HTMLElement).dataset.tab}-tab`)?.classList.add('active');
     });
   });
+
+  loadCases();
+
+  const settings = storage.getUserData().settings;
+  (document.getElementById('initial-balance') as HTMLInputElement).value = settings.initialBalance.toString();
+  (document.getElementById('sound-enabled') as HTMLInputElement).checked = settings.soundEnabled;
+  (document.getElementById('animation-enabled') as HTMLInputElement).checked = settings.animationEnabled;
 </script>
