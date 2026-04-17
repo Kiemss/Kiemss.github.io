@@ -132,12 +132,18 @@ const cases = casesData.cases;
     text-align: center;
     transition: all 0.3s;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
   }
   
   .case-card:hover {
     transform: translateY(-5px);
     border-color: var(--color-primary);
     box-shadow: 0 10px 30px rgba(228, 78, 0, 0.3);
+  }
+  
+  .case-card.selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 30px rgba(228, 78, 0, 0.5);
   }
   
   .case-image {
@@ -211,6 +217,26 @@ const cases = casesData.cases;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    padding: 0 50%;
+  }
+  
+  .wheel-item {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+  }
+  
+  .wheel-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
   
   .result-modal {
@@ -276,7 +302,160 @@ const cases = casesData.cases;
 </style>
 
 <script>
-  // 抽奖逻辑将在后续实现
+  import { StorageManager } from '@/scripts/storage-manager';
+  import { LotteryEngine } from '@/scripts/lottery-engine';
+  import { EconomySystem } from '@/scripts/economy-system';
+  import { RarityColors, RarityNames } from '@/types/rarity';
+  import type { Case, CaseItem } from '@/types/case';
+
+  const storage = StorageManager.getInstance();
+  const lottery = new LotteryEngine();
+  const economy = new EconomySystem();
+
+  let selectedCase: Case | null = null;
+  let isSpinning = false;
+
+  function updateBalanceDisplay() {
+    const balance = economy.getBalance();
+    const profitLoss = economy.getProfitLoss();
+    
+    const balanceEl = document.getElementById('balance-amount');
+    const profitEl = document.getElementById('profit-amount');
+    
+    if (balanceEl) balanceEl.textContent = `$${balance.toFixed(2)}`;
+    if (profitEl) {
+      profitEl.textContent = `${profitLoss >= 0 ? '+' : ''}$${profitLoss.toFixed(2)}`;
+      profitEl.style.color = profitLoss >= 0 ? '#4caf50' : '#f44336';
+    }
+  }
+
+  function selectCase(caseId: string) {
+    const cases = storage.getCases();
+    selectedCase = cases.find(c => c.id === caseId) || null;
+    
+    if (selectedCase) {
+      document.querySelectorAll('.case-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      document.querySelector(`[data-case-id="${caseId}"]`)?.classList.add('selected');
+    }
+  }
+
+  async function openCase() {
+    if (!selectedCase || isSpinning) return;
+    
+    const totalCost = selectedCase.price + selectedCase.keyPrice;
+    
+    if (!economy.canAfford(totalCost)) {
+      alert(`余额不足！需要 $${totalCost.toFixed(2)}`);
+      return;
+    }
+
+    if (selectedCase.items.length === 0) {
+      alert('这个箱子还没有配置奖品！');
+      return;
+    }
+
+    isSpinning = true;
+    economy.spend(totalCost, `开箱: ${selectedCase.name}`, selectedCase.id);
+    updateBalanceDisplay();
+
+    const wheelItems = lottery.generateWheelItems(selectedCase.items, 50);
+    const winningItem = wheelItems[Math.floor(wheelItems.length / 2)];
+
+    await showWheelAnimation(wheelItems, winningItem);
+    showResult(winningItem);
+
+    isSpinning = false;
+  }
+
+  async function showWheelAnimation(items: CaseItem[], winningItem: CaseItem): Promise<void> {
+    return new Promise((resolve) => {
+      const wheelContainer = document.getElementById('lottery-wheel') as HTMLElement;
+      const wheelItems = document.getElementById('wheel-items') as HTMLElement;
+      
+      wheelContainer.style.display = 'block';
+      
+      wheelItems.innerHTML = items.map((item, index) => `
+        <div class="wheel-item" style="border-color: ${RarityColors[item.rarity]}">
+          <img src="${item.image}" alt="${item.name}" />
+        </div>
+      `).join('');
+
+      const itemWidth = 120;
+      const totalWidth = items.length * itemWidth;
+      const containerWidth = wheelContainer.offsetWidth;
+      const winningIndex = Math.floor(items.length / 2);
+      const scrollPosition = (winningIndex * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
+
+      wheelItems.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      wheelItems.style.transform = `translateX(-${scrollPosition}px)`;
+
+      setTimeout(() => {
+        resolve();
+      }, 5000);
+    });
+  }
+
+  function showResult(item: CaseItem) {
+    const modal = document.getElementById('result-modal') as HTMLElement;
+    const image = document.getElementById('result-image') as HTMLImageElement;
+    const name = document.getElementById('result-name') as HTMLElement;
+    const rarity = document.getElementById('result-rarity') as HTMLElement;
+    const price = document.getElementById('result-price') as HTMLElement;
+
+    image.src = item.inspectImage || item.image;
+    name.textContent = item.name;
+    rarity.textContent = RarityNames[item.rarity];
+    rarity.style.color = RarityColors[item.rarity];
+    price.textContent = `$${item.price.toFixed(2)}`;
+
+    modal.style.display = 'flex';
+
+    const inventoryItem: any = {
+      ...item,
+      obtainedAt: new Date(),
+      caseId: selectedCase!.id,
+      caseName: selectedCase!.name
+    };
+    economy.addToInventory(inventoryItem);
+
+    const historyRecord: any = {
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      caseId: selectedCase!.id,
+      caseName: selectedCase!.name,
+      item,
+      timestamp: new Date()
+    };
+    economy.addHistory(historyRecord);
+  }
+
+  document.querySelectorAll('.case-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const caseId = card.getAttribute('data-case-id');
+      if (caseId) selectCase(caseId);
+    });
+
+    const btn = card.querySelector('.open-case-btn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const caseId = card.getAttribute('data-case-id');
+        if (caseId) {
+          selectCase(caseId);
+          openCase();
+        }
+      });
+    }
+  });
+
+  document.getElementById('close-modal')?.addEventListener('click', () => {
+    (document.getElementById('result-modal') as HTMLElement).style.display = 'none';
+    (document.getElementById('lottery-wheel') as HTMLElement).style.display = 'none';
+  });
+
+  updateBalanceDisplay();
+
   console.log('CS2抽奖模拟器已加载');
   console.log('可用箱子:', cases);
 </script>
