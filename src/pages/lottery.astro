@@ -1,0 +1,282 @@
+---
+import Layout from '@/components/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import casesData from '@/data/default-cases.json';
+
+const cases = casesData.cases;
+---
+
+<Layout 
+  title="CS2抽奖模拟器"
+  description="CS2风格的开箱抽奖模拟器"
+>
+  <Header currentPage="/lottery" />
+  
+  <main class="lottery-page">
+    <div class="container">
+      <h1>CS2 抽奖模拟器</h1>
+      <p class="subtitle">选择一个箱子开始开箱</p>
+      
+      <div class="balance-info">
+        <div class="balance">
+          <span class="label">余额:</span>
+          <span class="amount" id="balance-amount">$100.00</span>
+        </div>
+        <div class="profit-loss">
+          <span class="label">盈亏:</span>
+          <span class="amount" id="profit-amount">$0.00</span>
+        </div>
+      </div>
+      
+      <div class="cases-grid">
+        {cases.map((caseItem) => (
+          <div class="case-card" data-case-id={caseItem.id}>
+            <img src={caseItem.image} alt={caseItem.name} class="case-image" />
+            <h3 class="case-name">{caseItem.name}</h3>
+            <p class="case-price">${caseItem.price.toFixed(2)}</p>
+            <button class="open-case-btn">开箱</button>
+          </div>
+        ))}
+      </div>
+      
+      <div class="lottery-wheel-container" id="lottery-wheel" style="display: none;">
+        <div class="wheel-wrapper">
+          <div class="wheel-pointer">▼</div>
+          <div class="wheel-items" id="wheel-items">
+            <!-- 动态生成的奖品卡片 -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="result-modal" id="result-modal" style="display: none;">
+        <div class="modal-content">
+          <img src="" alt="" class="result-image" id="result-image" />
+          <h2 class="result-name" id="result-name"></h2>
+          <p class="result-rarity" id="result-rarity"></p>
+          <p class="result-price" id="result-price"></p>
+          <button class="close-modal-btn" id="close-modal">关闭</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .lottery-page {
+    flex: 1;
+    padding: 2rem;
+    min-height: calc(100vh - 200px);
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+    text-shadow: 0 0 30px rgba(228, 78, 0, 0.5);
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+  
+  .balance-info {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background: rgba(228, 78, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(228, 78, 0, 0.3);
+  }
+  
+  .balance, .profit-loss {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .label {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+  }
+  
+  .amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-text);
+  }
+  
+  .cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .case-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .case-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 30px rgba(228, 78, 0, 0.3);
+  }
+  
+  .case-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+  
+  .case-name {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+  
+  .case-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+  
+  .open-case-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .open-case-btn:hover {
+    background: rgba(228, 78, 0, 0.8);
+    box-shadow: 0 0 20px rgba(228, 78, 0, 0.5);
+  }
+  
+  .lottery-wheel-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+  
+  .wheel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .wheel-pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    color: var(--color-primary);
+    z-index: 10;
+    text-shadow: 0 0 10px rgba(228, 78, 0, 0.8);
+  }
+  
+  .wheel-items {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .result-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: var(--color-background);
+    padding: 3rem;
+    border-radius: 16px;
+    text-align: center;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 50px rgba(228, 78, 0, 0.5);
+  }
+  
+  .result-image {
+    width: 300px;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+  }
+  
+  .result-name {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-rarity {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+  }
+  
+  .close-modal-btn {
+    padding: 0.75rem 2rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .close-modal-btn:hover {
+    background: rgba(228, 78, 0, 0.8);
+  }
+</style>
+
+<script>
+  // 抽奖逻辑将在后续实现
+  console.log('CS2抽奖模拟器已加载');
+  console.log('可用箱子:', cases);
+</script>

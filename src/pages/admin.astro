@@ -1,0 +1,413 @@
+---
+import Layout from '@/components/Layout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+---
+
+<Layout 
+  title="管理界面 - CS2抽奖模拟器"
+  description="CS2抽奖模拟器管理界面"
+>
+  <Header currentPage="/admin" />
+  
+  <main class="admin-page">
+    <div class="container">
+      <h1>管理界面</h1>
+      <p class="subtitle">配置箱子、奖品和概率</p>
+      
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="cases">箱子管理</button>
+        <button class="tab-btn" data-tab="data">数据管理</button>
+        <button class="tab-btn" data-tab="settings">设置</button>
+      </div>
+      
+      <div class="tab-content active" id="cases-tab">
+        <div class="section-header">
+          <h2>箱子列表</h2>
+          <button class="btn-primary" id="add-case-btn">+ 添加箱子</button>
+        </div>
+        
+        <div class="cases-list" id="cases-list">
+          <div class="empty-state">
+            <p>暂无箱子配置</p>
+            <p class="hint">点击"添加箱子"开始配置</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="data-tab">
+        <div class="section-header">
+          <h2>数据管理</h2>
+        </div>
+        
+        <div class="data-actions">
+          <div class="action-card">
+            <h3>导出配置</h3>
+            <p>将当前配置导出为JSON文件</p>
+            <button class="btn-secondary" id="export-config-btn">导出配置</button>
+          </div>
+          
+          <div class="action-card">
+            <h3>导入配置</h3>
+            <p>从JSON文件导入配置</p>
+            <input type="file" id="import-config-input" accept=".json" style="display: none;" />
+            <button class="btn-secondary" id="import-config-btn">导入配置</button>
+          </div>
+          
+          <div class="action-card">
+            <h3>重置配置</h3>
+            <p>恢复为默认配置</p>
+            <button class="btn-danger" id="reset-config-btn">重置配置</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="settings-tab">
+        <div class="section-header">
+          <h2>系统设置</h2>
+        </div>
+        
+        <div class="settings-form">
+          <div class="form-group">
+            <label>初始余额</label>
+            <input type="number" id="initial-balance" value="100" step="0.01" />
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="sound-enabled" checked />
+              启用音效
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="animation-enabled" checked />
+              启用动画
+            </label>
+          </div>
+          
+          <button class="btn-primary" id="save-settings-btn">保存设置</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div class="modal" id="case-modal" style="display: none;">
+    <div class="modal-content">
+      <h2 id="modal-title">添加箱子</h2>
+      
+      <form id="case-form">
+        <div class="form-group">
+          <label>箱子名称 *</label>
+          <input type="text" id="case-name" required />
+        </div>
+        
+        <div class="form-group">
+          <label>箱子价格 (USD) *</label>
+          <input type="number" id="case-price" step="0.01" required />
+        </div>
+        
+        <div class="form-group">
+          <label>钥匙价格 (USD) *</label>
+          <input type="number" id="key-price" step="0.01" required />
+        </div>
+        
+        <div class="form-group">
+          <label>箱子图片</label>
+          <input type="file" id="case-image" accept="image/*" />
+          <div class="image-preview" id="case-image-preview"></div>
+        </div>
+        
+        <div class="form-group">
+          <label>或输入图片URL</label>
+          <input type="url" id="case-image-url" placeholder="https://..." />
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancel-case-btn">取消</button>
+          <button type="submit" class="btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .admin-page {
+    flex: 1;
+    padding: 2rem;
+    min-height: calc(100vh - 200px);
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+    text-shadow: 0 0 30px rgba(228, 78, 0, 0.5);
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+  
+  .admin-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+  }
+  
+  .tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+  }
+  
+  .tab-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .tab-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+  }
+  
+  .btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+  
+  .btn-primary:hover {
+    background: rgba(228, 78, 0, 0.8);
+    box-shadow: 0 0 20px rgba(228, 78, 0, 0.5);
+  }
+  
+  .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .btn-danger {
+    padding: 0.75rem 1.5rem;
+    background: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  
+  .btn-danger:hover {
+    background: rgba(220, 53, 69, 1);
+  }
+  
+  .cases-list {
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: var(--color-text-muted);
+  }
+  
+  .empty-state .hint {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .data-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .action-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .action-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+  
+  .action-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .settings-form {
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="url"] {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 1rem;
+  }
+  
+  .form-group input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--color-text);
+  }
+  
+  .form-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+  
+  .image-preview {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal .modal-content {
+    background: var(--color-background);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--color-primary);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal h2 {
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+  }
+  
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .modal-actions button {
+    flex: 1;
+  }
+</style>
+
+<script>
+  // 管理界面逻辑将在后续实现
+  console.log('管理界面已加载');
+  
+  // 标签切换
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      btn.classList.add('active');
+      document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+    });
+  });
+</script>
